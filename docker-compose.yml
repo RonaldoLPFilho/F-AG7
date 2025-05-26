@@ -1,0 +1,40 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: auth_service_db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: auth_service
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password
+    networks:
+      - agnello_network
+
+  auth-service:
+    build: ./auth-service
+    container_name: auth-service
+    depends_on:
+      - mysql
+    ports:
+      - "8080:8080"
+    networks:
+      - agnello_network
+
+  pedidos-service:
+    build: ./pedidos-service
+    container_name: pedidos-service
+    depends_on:
+      - auth-service
+    networks:
+      - agnello_network
+
+volumes:
+  mysql_data:
+    name: auth_service_mysql_data
+
+networks:
+  agnello_network:
+    name: agnello_network
