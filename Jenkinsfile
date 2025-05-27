@@ -28,7 +28,6 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo "Subindo containers..."
-                sh 'docker compose up -d'
             }
         }
     }
