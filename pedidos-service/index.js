@@ -23,6 +23,7 @@ async function aguardarAuthService() {
       }
     } catch (err) {
       console.log(`[Pedidos Service] Tentativa ${tentativas + 1}: Auth Service ainda não está pronto...`);
+      console.log(err);
       await new Promise(res => setTimeout(res, 3000)); 
     }
   }
