@@ -1,46 +1,44 @@
 pipeline {
     agent any
 
-    environment {
-        PROJECT_NAME = 'vinheria-agnello'
-    }
-
     stages {
-        stage('Clonar repositório') {
+        stage('Checkout') {
             steps {
-                echo "Clonando repositório da Vinheria Agnello"
-                // Jenkins já faz o checkout automaticamente se o Jenkinsfile está no repositório
+                echo "Clonando código..."
+                checkout scm
             }
         }
 
-        stage('Build das imagens Docker') {
+        stage('Testes') {
             steps {
-                echo "Construindo imagens Docker dos microsserviços"
+                echo "Rodando testes..."
+                dir('auth-service') {
+                    sh './mvnw clean test'
+                }
+            }
+        }
+
+        stage('Build Docker') {
+            steps {
+                echo "Buildando imagens Docker..."
                 sh 'docker compose build'
             }
         }
 
-        stage('Subir containers') {
+        stage('Deploy') {
             steps {
-                echo "Subindo microsserviços simulados com Docker Compose"
+                echo "Subindo containers..."
                 sh 'docker compose up -d'
-            }
-        }
-
-        stage('Verificar status dos containers') {
-            steps {
-                echo "Listando containers em execução"
-                sh 'docker ps'
             }
         }
     }
 
     post {
         success {
-            echo "✅ Pipeline executado com sucesso!"
+            echo "✅ Deploy simulado com sucesso!"
         }
         failure {
-            echo "❌ Algo deu errado na execução da pipeline."
+            echo "❌ Algo deu errado no pipeline."
         }
     }
 }
